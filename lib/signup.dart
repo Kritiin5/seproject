@@ -10,9 +10,10 @@ class SignUpPage extends StatefulWidget {
 }
 
 class SignUpPageState extends State<SignUpPage> {
-  TextEditingController usernameController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController uidController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  TextEditingController uidcontroller = TextEditingController();
 
   bool isButtonClicked = false;
   bool valid = false;
@@ -20,6 +21,8 @@ class SignUpPageState extends State<SignUpPage> {
   bool user = false;
   bool pwd = false;
   bool isPwdVisible = false;
+  bool isConfirmPwdVisible = false;
+
   bool signUp = false;
   bool forgotPwd = false;
   String errorMsg = "";
@@ -28,11 +31,12 @@ class SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
+        body: SafeArea(
+      child: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+              padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 50.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -40,7 +44,7 @@ class SignUpPageState extends State<SignUpPage> {
                     "Let's get started!",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 35.0,
+                      fontSize: 30.0,
                     ),
                   ),
                   SizedBox(height: 7.0),
@@ -52,20 +56,36 @@ class SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
 
-                  SizedBox(height: 40.0),
+                  SizedBox(height: 30.0),
                   // name
                   TextFormField(
-                    controller: usernameController,
+                    controller: nameController,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return "Please enter name";
+                      }
+                    },
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: "Enter Name",
-                      prefixIcon: Icon(Icons.email_outlined),
-                    ),
+                        border: OutlineInputBorder(),
+                        labelText: "Enter Name",
+                        prefixIcon: Icon(Icons.person_3_outlined)),
                   ),
                   SizedBox(height: 20.0),
                   // email id
                   TextFormField(
-                    controller: usernameController,
+                    controller: emailController,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return "Email field can't be empty";
+                      }
+                      bool isEmailValid = RegExp(
+                        r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$',
+                      ).hasMatch(value);
+
+                      if (!isEmailValid) {
+                        return "Please enter valid email";
+                      }
+                    },
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: "Enter Email",
@@ -75,27 +95,32 @@ class SignUpPageState extends State<SignUpPage> {
                   SizedBox(height: 20.0),
                   // Uid Input
                   TextFormField(
-                    controller: uidcontroller,
-                    validator: (value) {
-                      if (value == null || value == value.isEmpty) {
-                        // valid = false;
-                        errorMsg = "Username can\'t be empty";
-                        return errorMsg;
-                      } else {
-                        valid = true;
-                        errorMsg = '';
-                        return errorMsg;
-                      }
-                    },
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Enter UID",
-                        prefixIcon: Icon(Icons.perm_identity_outlined)),
-                  ),
+                      controller: uidController,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Uid field can't be empty";
+                        }
+
+                        if (value.length > 7) {
+                          return "Please enter valid UID";
+                        }
+                      },
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: "Enter UID",
+                          prefixIcon: Icon(Icons.person))),
                   SizedBox(height: 20.0),
                   // password
                   TextFormField(
                     controller: passwordController,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return "Password field can't be empty";
+                      }
+                      if (value.length < 4) {
+                        return "Password should have minimum 4 characters";
+                      }
+                    },
                     obscureText: isPwdVisible ? false : true,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
@@ -114,9 +139,16 @@ class SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                   SizedBox(height: 15),
+                  // confirm password
                   TextFormField(
-                    controller: passwordController,
-                    obscureText: isPwdVisible ? false : true,
+                    obscureText: isConfirmPwdVisible ? false : true,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return "Kindly confirm password";
+                      } else if (passwordController.text != value) {
+                        return "Password is not matching";
+                      }
+                    },
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: "Confirm Password",
@@ -124,21 +156,14 @@ class SignUpPageState extends State<SignUpPage> {
                       suffixIcon: GestureDetector(
                         onTap: () {
                           setState(() {
-                            isPwdVisible = !isPwdVisible;
+                            isConfirmPwdVisible = !isConfirmPwdVisible;
                           });
                         },
-                        child: Icon(isPwdVisible
+                        child: Icon(isConfirmPwdVisible
                             ? Icons.visibility
                             : Icons.visibility_off),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 15),
-                  InkWell(
-                    onTap: () {
-                      Navigator.pushReplacementNamed(context, Routes.verifyAcc);
-                    },
-                    child: Text("Forgot Password?"),
                   ),
 
                   SizedBox(height: 30.0),
@@ -148,39 +173,16 @@ class SignUpPageState extends State<SignUpPage> {
                     color: Colors.black87,
                     child: InkWell(
                       onTap: () async {
-                        // async
                         setState(() {
                           isButtonClicked = true;
-                          // right now used the or operator but later on
-                          // if (usernameController.text.isNotEmpty ||
-                          //     passwordController.text.isNotEmpty) {
-                          //   print("Username: ${usernameController.text}");
-                          //   print("Password: ${passwordController.text}");
-                          //   valid = true;
-                          // } else if (usernameController.text.isEmpty) {
-                          //   user = false;
-                          // } else if (passwordController.text.isEmpty) {
-                          //   pwd = false;
-                          // }
-                          if (_formKey.currentState!.validate()) {
-                            print('budyy');
-                          }
                         });
 
-                        await Future.delayed(Duration(seconds: 5));
-                        // if (isButtonClicked && valid)
-                        await Navigator.pushReplacementNamed(
-                          context,
-                          Routes.homeRoute,
-                        );
+                        await Future.delayed(Duration(seconds: 3));
+
                         if (_formKey.currentState!.validate()) {
-                          // if (valid){
-                          errorMsg =
-                              _formKey.currentState!.validate() as String;
-                          // valid = true;
-                          print("email: ${usernameController.text}");
+                          valid = true;
+                          print("name: ${nameController.text}");
                           print("Password: ${passwordController.text}");
-                          print(errorMsg);
                         }
                         setState(() {
                           isButtonClicked = false;
@@ -212,36 +214,45 @@ class SignUpPageState extends State<SignUpPage> {
                   SizedBox(
                     height: 30.0,
                   ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Already have an account?",
+                          style: TextStyle(fontSize: 16)),
+                      // SizedBox(height: -10,),
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            Navigator.pushReplacementNamed(
+                              context,
+                              Routes.loginRoute,
+                            );
+                          });
+                        },
+                        child: Text(
+                          "Login",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        // ),
+                      ),
+                    ],
+                  ),
                   Visibility(
                     visible: isButtonClicked,
                     child: Text(
                       valid
-                          ? "${usernameController.text} logging in..."
-                          : errorMsg, // ERROR: error msg is null everytime
-                      style:
-                          TextStyle(color: valid ? Colors.green : Colors.red),
+                          ? "Account created successfully"
+                          : "Kindly fill all the fields", // ERROR: error msg is null everytime
+                      style: TextStyle(
+                          color: valid ? Colors.green : Colors.red,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  Text("Don't have an account?"),
-                  InkWell(
-                    onTap: () {
-                      setState(() {
-                        Navigator.pushReplacementNamed(
-                          context,
-                          Routes.signUp,
-                        );
-                      });
-                    },
-                    // child: AnimatedContainer(
-                    //   duration: Duration(seconds: 1),
-                    //   curve: Curves.easeInOut,
-                    child: Text("Sign Up"),
-                    // ),
                   ),
                 ],
               )),
         ),
       ),
-    );
+    ));
   }
 }
