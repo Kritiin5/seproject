@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-// import 'home_page.dart';
 import 'routes.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -36,7 +35,8 @@ class SignUpPageState extends State<SignUpPage> {
         child: Form(
           key: _formKey,
           child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 50.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 40.0, vertical: 50.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -219,15 +219,10 @@ class SignUpPageState extends State<SignUpPage> {
                     children: [
                       Text("Already have an account?",
                           style: TextStyle(fontSize: 16)),
-                      // SizedBox(height: -10,),
                       TextButton(
                         onPressed: () {
-                          setState(() {
-                            Navigator.pushReplacementNamed(
-                              context,
-                              Routes.loginRoute,
-                            );
-                          });
+                          Navigator.pushReplacementNamed(
+                              context, Routes.loginPage);
                         },
                         child: Text(
                           "Login",

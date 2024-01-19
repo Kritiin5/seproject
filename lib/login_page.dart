@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-// import 'home_page.dart';
 import 'routes.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,9 +15,6 @@ class LoginPageState extends State<LoginPage> {
 
   bool isButtonClicked = false;
   bool valid = false;
-  bool btnChange = false;
-  bool user = false;
-  bool pwd = false;
   bool isPwdVisible = false;
   bool signUp = false;
   bool forgotPwd = false;
@@ -133,7 +129,7 @@ class LoginPageState extends State<LoginPage> {
                     child: TextButton(
                       onPressed: () {
                         Navigator.pushReplacementNamed(
-                            context, Routes.verifyAcc);
+                            context, Routes.verifyAccount);
                       },
                       child: Text(
                         "Forgot Password?",
@@ -162,7 +158,7 @@ class LoginPageState extends State<LoginPage> {
                           passwordController.clear();
                           await Navigator.pushReplacementNamed(
                             context,
-                            Routes.homeRoute,
+                            Routes.homePage,
                           );
                         }
 
