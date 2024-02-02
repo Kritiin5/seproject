@@ -1,5 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 
+// flaws so far (found by rd)
+// 1. tick mark icon not displaying on the click of the create button
+// 2. The app crashes when clicking on the 'Create' Button without displaying text in Visibility Class
+// PLS NOTE; DO NOT DELETE THE AWAIT FUTURE DELAYED FUNCTION AS IT IS AN VITAL PART OF THIS CODE
+
 import 'package:flutter/material.dart';
 import 'routes.dart';
 
@@ -13,18 +18,13 @@ class SignUpPageState extends State<SignUpPage> {
   TextEditingController uidController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
 
   bool isButtonClicked = false;
   bool valid = false;
-  bool btnChange = false;
-  bool user = false;
-  bool pwd = false;
   bool isPwdVisible = false;
   bool isConfirmPwdVisible = false;
 
-  bool signUp = false;
-  bool forgotPwd = false;
-  String errorMsg = "";
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -95,7 +95,7 @@ class SignUpPageState extends State<SignUpPage> {
                   SizedBox(height: 20.0),
                   // Uid Input
                   TextFormField(
-                      controller: uidController,
+                      controller: phoneController,
                       validator: (value) {
                         if (value!.isEmpty) {
                           return "Uid field can't be empty";
@@ -109,6 +109,14 @@ class SignUpPageState extends State<SignUpPage> {
                           border: OutlineInputBorder(),
                           labelText: "Enter UID",
                           prefixIcon: Icon(Icons.person))),
+                  SizedBox(height: 20.0),
+                  // Phone number
+                  TextFormField(
+                      controller: uidController,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: "Enter Phone (optional)",
+                          prefixIcon: Icon(Icons.phone))),
                   SizedBox(height: 20.0),
                   // password
                   TextFormField(
@@ -169,45 +177,41 @@ class SignUpPageState extends State<SignUpPage> {
                   SizedBox(height: 30.0),
                   Material(
                     borderRadius: BorderRadius.circular(35),
-                    // color: Colors.deepPurple[700],
                     color: Colors.black87,
                     child: InkWell(
                       onTap: () async {
                         setState(() {
+                          print("create is clicked");
                           isButtonClicked = true;
                         });
 
-                        await Future.delayed(Duration(seconds: 3));
+                        await Future.delayed(Duration(seconds: 4));
 
                         if (_formKey.currentState!.validate()) {
                           valid = true;
                           print("name: ${nameController.text}");
                           print("Password: ${passwordController.text}");
+                       
+                        }
+                        if (valid) {
+                          Navigator.pushReplacementNamed(
+                              context, Routes.loginPage);
                         }
                         setState(() {
                           isButtonClicked = false;
                         });
                       },
                       child: AnimatedContainer(
-                        duration: Duration(seconds: 1),
+                        duration: Duration(seconds: 2),
                         height: 50.0,
-                        width: isButtonClicked && valid ? 50.0 : 100.0,
+                        width: isButtonClicked & valid ? 50.0 : 100.0,
                         alignment: Alignment.center,
-
-                        child: isButtonClicked && valid
-                            ? Icon(
-                                Icons.done,
-                                color: Colors.white,
-                              )
-                            : Text("Create",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                )),
-
-                        // decoration: BoxDecoration(
-                        //     color: Colors.purple[700]),
+                        child: Text("Create",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            )),
                       ),
                     ),
                   ),
@@ -236,8 +240,8 @@ class SignUpPageState extends State<SignUpPage> {
                     visible: isButtonClicked,
                     child: Text(
                       valid
-                          ? "Account created successfully"
-                          : "Kindly fill all the fields", // ERROR: error msg is null everytime
+                          ? "Account created successfully "
+                          : "", // ERROR: error msg is null everytime
                       style: TextStyle(
                           color: valid ? Colors.green : Colors.red,
                           fontSize: 15,
